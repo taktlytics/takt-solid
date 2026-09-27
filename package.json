@@ -1,6 +1,6 @@
 {
   "name": "@vskstudio/takt-solid",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Idiomatic Solid wrapper for Takt privacy-friendly analytics",
   "license": "MIT",
   "author": "VSK Studio",

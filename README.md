@@ -91,9 +91,51 @@ export function SignupButton() {
 | `exclude`          | `string[]`            | —                    | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
 | `scrubUrl`         | `(url: string) => string` | —              | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop — config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
+| `redactRoutes`     | `string[]`            | —                    | Route patterns sent as the pattern instead of the real path, e.g. `['/verify/:token']`. See [Route redaction](#route-redaction). |
+| `routeTemplates`   | `boolean`             | `false`              | Send every page as its route template (`/blog/:slug`). Needs `routeTemplate`. |
+| `routeTemplate`    | `() => string \| null \| undefined` | —   | Returns the current route template. Use `solidRouterTemplate(useCurrentMatches())` with `@solidjs/router`. |
 | `debug`            | `boolean`             | `false`              | Log each payload to the console before sending.                |
 
-> Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect — remount the component to reconfigure.
+> Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect, so remount the component to reconfigure. `routeTemplate` is the exception: it is read on every pageview.
+
+## Route redaction
+
+Query strings are stripped by default, but path segments are sent as they are: `/verify/abc123` leaks the token. `redactRoutes` lists the sensitive routes; a matching path is sent as the pattern and every other path keeps its real value.
+
+```tsx
+<Takt domain="example.com" redactRoutes={['/verify/:token', '/reset/:code', '/invoices/:id']}>
+  <App />
+</Takt>
+```
+
+Patterns accept Solid Router syntax (`:param`, `:param?`, `*rest`) as well as `[param]`, `[[optional]]`, `[...rest]`, `(group)`, `*` and `**`. The rule covers the page URL, same-origin referrers, outbound and download link destinations, and 404 paths.
+
+For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
+
+```tsx
+import { Router, Route, useCurrentMatches, type RouteSectionProps } from '@solidjs/router'
+import { Takt, solidRouterTemplate } from '@vskstudio/takt-solid'
+
+function Layout(props: RouteSectionProps) {
+  const matches = useCurrentMatches()
+  return (
+    <Takt domain="example.com" routeTemplates routeTemplate={solidRouterTemplate(matches)}>
+      {props.children}
+    </Takt>
+  )
+}
+
+export function App() {
+  return (
+    <Router root={Layout}>
+      <Route path="/" component={Home} />
+      <Route path="/blog/:slug" component={Post} />
+    </Router>
+  )
+}
+```
+
+`solidRouterTemplate` only needs an accessor returning `{ route: { pattern } }[]`, so the package does not depend on `@solidjs/router`. When no route matches, `redactRoutes` still applies and the real path is sent otherwise. On a public site this mode merges every article into one row, so prefer `redactRoutes` there.
 
 ## Declarative click tracking
 
@@ -146,6 +188,7 @@ import '@vskstudio/takt-solid/element'
 | `sample-rate`      | value         | Fraction of sessions to track (0–1); ignored if not a number.   |
 | `query-params`     | value         | Comma-separated list of query parameters to keep.               |
 | `exclude`          | value         | Comma-separated path prefixes never tracked.                    |
+| `redact-routes`    | value         | Comma-separated route patterns sent as the pattern, e.g. `/verify/:token, /reset/:code`. |
 | `respect-dnt`      | default-on    | Disabled only by `"false"`/`"0"`.                               |
 | `exclude-localhost`| default-on    | Disabled only by `"false"`/`"0"`.                               |
 | `spa`              | default-on    | Disabled only by `"false"`/`"0"`.                               |
@@ -157,7 +200,7 @@ import '@vskstudio/takt-solid/element'
 | `tagged`           | presence flag | Auto-track `[data-takt-event]` element clicks.                  |
 | `debug`            | opt-in value  | Applied only when the attribute is present; logs each payload.  |
 
-Privacy attributes are on by default and only disabled by an explicit `"false"`/`"0"`; presence flags activate when the attribute exists at all. `scrubUrl` is a function prop and has no attribute equivalent.
+Privacy attributes are on by default and only disabled by an explicit `"false"`/`"0"`; presence flags activate when the attribute exists at all. `scrubUrl` is a function prop and has no attribute equivalent. `routeTemplates` has none either, since the element has no router.
 
 ## SSR
 

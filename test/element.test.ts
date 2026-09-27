@@ -119,6 +119,25 @@ describe('<takt-analytics> element', () => {
     el.remove()
   })
 
+  it('forwards redact-routes CSV as redactRoutes array', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    el.setAttribute('redact-routes', '/verify/[token], /reset/:code,')
+    document.body.appendChild(el)
+    expect(createTakt).toHaveBeenCalledWith(
+      expect.objectContaining({ redactRoutes: ['/verify/[token]', '/reset/:code'] }),
+    )
+    el.remove()
+  })
+
+  it('omits redactRoutes when redact-routes is absent', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    document.body.appendChild(el)
+    expect(createTakt).toHaveBeenCalledWith(expect.not.objectContaining({ redactRoutes: expect.anything() }))
+    el.remove()
+  })
+
   it('forwards debug presence as debug: true', () => {
     defineTaktElement()
     const el = document.createElement('takt-analytics')

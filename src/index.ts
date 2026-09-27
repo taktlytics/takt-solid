@@ -5,6 +5,7 @@ export { TaktEvent } from './TaktEvent'
 export { TaktBadge, type TaktBadgeProps } from './TaktBadge'
 export { TaktEmbed, type TaktEmbedProps } from './TaktEmbed'
 export type { TaktInstance } from './store'
+export { solidRouterTemplate, type RouteMatchesAccessor } from './solidRouterTemplate'
 export {
   createStats,
   PublicApiError,

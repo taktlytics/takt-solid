@@ -1,4 +1,4 @@
-import type { createTakt } from '@vskstudio/takt-core'
+import { optOut, optIn, isOptedOut, type createTakt } from '@vskstudio/takt-core'
 
 // Public structural surface of core's Analytics. Picking the public methods
 // drops the class's private members, which otherwise make the emitted .d.ts
@@ -14,6 +14,7 @@ export type TaktInstance = Pick<
   | 'enableTagged'
   | 'optOut'
   | 'optIn'
+  | 'isOptedOut'
 >
 
 let _noop: TaktInstance | null = null
@@ -36,8 +37,9 @@ export function noopTakt(): TaktInstance {
     enableFiles: noDispose,
     enable404: noDispose,
     enableTagged: noDispose,
-    optOut: () => {},
-    optIn: () => {},
+    optOut,
+    optIn,
+    isOptedOut,
   }
   return _noop
 }

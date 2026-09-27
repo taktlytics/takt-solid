@@ -8,6 +8,9 @@ export type { TaktInstance } from './store'
 export {
   createStats,
   PublicApiError,
+  optOut,
+  optIn,
+  isOptedOut,
   badgeUrl,
   embedUrl,
   type Config,

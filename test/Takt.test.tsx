@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@solidjs/testing-library'
-import { getOwner, runWithOwner } from 'solid-js'
+import { createSignal, getOwner, runWithOwner } from 'solid-js'
 
 const { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, createTakt } = vi.hoisted(() => {
   const enableSpa = vi.fn(() => vi.fn())
@@ -97,6 +97,27 @@ describe('<Takt>', () => {
     expect(createTakt).toHaveBeenCalledWith(
       expect.objectContaining({ scriptOrigin: 'https://t.example.com' }),
     )
+  })
+
+  it('forwards redactRoutes and routeTemplates to createTakt', () => {
+    render(() => <Takt redactRoutes={['/verify/[token]']} routeTemplates>x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(
+      expect.objectContaining({ redactRoutes: ['/verify/[token]'], routeTemplates: true }),
+    )
+  })
+
+  it('leaves routeTemplate undefined when no resolver is given', () => {
+    render(() => <Takt routeTemplates>x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ routeTemplate: undefined }))
+  })
+
+  it('reads the routeTemplate prop at call time so a new resolver is honoured', () => {
+    const [resolver, setResolver] = createSignal<() => string | null>(() => '/blog/:slug')
+    render(() => <Takt routeTemplates routeTemplate={resolver()}>x</Takt>)
+    const config = (createTakt.mock.calls[0] as unknown[])[0] as { routeTemplate: () => string | null | undefined }
+    expect(config.routeTemplate()).toBe('/blog/:slug')
+    setResolver(() => () => '/users/:id')
+    expect(config.routeTemplate()).toBe('/users/:id')
   })
 
   it('passes privacy defaults through to createTakt', () => {

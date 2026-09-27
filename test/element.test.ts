@@ -119,6 +119,15 @@ describe('<takt-analytics> element', () => {
     el.remove()
   })
 
+  it('forwards debug presence as debug: true', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    el.setAttribute('debug', '')
+    document.body.appendChild(el)
+    expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ debug: true }))
+    el.remove()
+  })
+
   it('forwards enabled="false" as enabled: false', () => {
     defineTaktElement()
     const el = document.createElement('takt-analytics')

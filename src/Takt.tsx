@@ -36,6 +36,7 @@ export interface TaktProps {
   scrubUrl?: (url: string) => string
   /** Auto-track `[data-takt-event]` element clicks (props read from `data-takt-prop-*`). */
   tagged?: boolean
+  debug?: boolean
   children?: JSX.Element
 }
 
@@ -59,6 +60,7 @@ export function Takt(props: TaktProps): JSX.Element {
       queryParams: props.queryParams,
       exclude: props.exclude,
       scrubUrl: props.scrubUrl,
+      debug: props.debug,
     })
     const disposers: Array<() => void> = []
     if (props.spa ?? true) disposers.push(takt.enableSpa())

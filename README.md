@@ -96,7 +96,7 @@ export function SignupButton() {
 | `routeTemplate`    | `() => string \| null \| undefined` | —   | Returns the current route template. Use `solidRouterTemplate(useCurrentMatches())` with `@solidjs/router`. |
 | `debug`            | `boolean`             | `false`              | Log each payload to the console before sending.                |
 
-> Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect — remount the component to reconfigure. `routeTemplate` is the exception: it is read on every pageview.
+> Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect, so remount the component to reconfigure. `routeTemplate` is the exception: it is read on every pageview.
 
 ## Route redaction
 

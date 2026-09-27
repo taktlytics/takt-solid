@@ -13,7 +13,7 @@ const { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pagevie
   return { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, createTakt }
 })
 
-vi.mock('@vskstudio/takt-core', () => ({ createTakt }))
+vi.mock('@vskstudio/takt-core', () => ({ createTakt, optOut: vi.fn(), optIn: vi.fn(), isOptedOut: vi.fn(() => false) }))
 
 import { Takt } from '../src/Takt'
 import { useTakt } from '../src/useTakt'
@@ -85,6 +85,11 @@ describe('<Takt>', () => {
     expect(disposeTagged).not.toHaveBeenCalled()
     unmount()
     expect(disposeTagged).toHaveBeenCalledOnce()
+  })
+
+  it('forwards debug to createTakt', () => {
+    render(() => <Takt debug>x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ debug: true }))
   })
 
   it('forwards scriptOrigin to createTakt', () => {

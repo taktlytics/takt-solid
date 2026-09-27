@@ -30,6 +30,7 @@ export function createTaktAnalyticsElement(): CustomElementConstructor {
         excludeLocalhost: truthy(attr('exclude-localhost')),
         ...(sampleRateAttr !== null && Number.isFinite(parseFloat(sampleRateAttr)) ? { sampleRate: parseFloat(sampleRateAttr) } : {}),
         ...(this.hasAttribute('track-query') ? { trackQuery: truthy(attr('track-query')) } : {}),
+        ...(this.hasAttribute('debug') ? { debug: truthy(attr('debug')) } : {}),
         ...(queryParams && queryParams.length > 0 ? { queryParams } : {}),
         ...(exclude && exclude.length > 0 ? { exclude } : {}),
         ...(this.hasAttribute('enabled') ? { enabled: truthy(attr('enabled')) } : {}),

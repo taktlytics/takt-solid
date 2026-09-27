@@ -89,8 +89,9 @@ export function SignupButton() {
 | `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
 | `queryParams`      | `string[]`            | —                    | Query parameters to keep when `trackQuery` is false.           |
 | `exclude`          | `string[]`            | —                    | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
-| `scrubUrl`         | `(url: string) => string` | —              | Transform page URLs before they are sent. Function prop — config only, not available as a custom-element attribute. |
+| `scrubUrl`         | `(url: string) => string` | —              | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop — config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
+| `debug`            | `boolean`             | `false`              | Log each payload to the console before sending.                |
 
 > Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect — remount the component to reconfigure.
 
@@ -154,6 +155,7 @@ import '@vskstudio/takt-solid/element'
 | `files`            | presence flag | Auto-track file downloads (all default extensions).             |
 | `track-404`        | presence flag | Report a `404` event on error pages.                            |
 | `tagged`           | presence flag | Auto-track `[data-takt-event]` element clicks.                  |
+| `debug`            | opt-in value  | Applied only when the attribute is present; logs each payload.  |
 
 Privacy attributes are on by default and only disabled by an explicit `"false"`/`"0"`; presence flags activate when the attribute exists at all. `scrubUrl` is a function prop and has no attribute equivalent.
 
@@ -164,6 +166,22 @@ Privacy attributes are on by default and only disabled by an explicit `"false"`/
 ## Privacy
 
 All privacy behavior lives in [`@vskstudio/takt-core`](https://www.npmjs.com/package/@vskstudio/takt-core): Do Not Track support, localhost exclusion, opt-in/opt-out consent, and a frozen wire payload. This wrapper never alters any of it.
+
+Consent works before `<Takt>` has mounted: `useTakt().optOut()`, `useTakt().optIn()` and `useTakt().isOptedOut()` go straight to the stored choice, and so do the `optOut`, `optIn` and `isOptedOut` functions exported by the package. A consent banner can therefore render first, and the instance created later honours the choice.
+
+```tsx
+import { createSignal } from 'solid-js'
+import { isOptedOut, optIn, optOut } from '@vskstudio/takt-solid'
+
+function AnalyticsToggle() {
+  const [blocked, setBlocked] = createSignal(isOptedOut())
+  const toggle = () => {
+    blocked() ? optIn() : optOut()
+    setBlocked(isOptedOut())
+  }
+  return <button onClick={toggle}>{blocked() ? 'Enable analytics' : 'Disable analytics'}</button>
+}
+```
 
 ## Widgets
 
@@ -187,7 +205,7 @@ const stats = createStats({ domain: 'example.com' })
 const summary = await stats.summary({ period: '7d' })
 ```
 
-The package also re-exports `badgeUrl`, `embedUrl` and `PublicApiError` from core, along with the widget and stats types, so you never need a direct import from `@vskstudio/takt-core` for them.
+The package also re-exports `badgeUrl`, `embedUrl`, `PublicApiError`, `optOut`, `optIn` and `isOptedOut` from core, along with the widget and stats types, so you never need a direct import from `@vskstudio/takt-core` for them.
 
 ## License
 

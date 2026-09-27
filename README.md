@@ -28,7 +28,7 @@ A thin, SSR-safe Solid layer over [`@vskstudio/takt-core`](https://www.npmjs.com
 pnpm add @vskstudio/takt-solid @vskstudio/takt-core
 ```
 
-`solid-js` (`^1.8`) and `@vskstudio/takt-core` (`>=0.8.1`) are peer dependencies.
+`solid-js` (`^1.8`) and `@vskstudio/takt-core` (`>=0.10.0`) are peer dependencies.
 
 ## Quick start — provider + accessor
 

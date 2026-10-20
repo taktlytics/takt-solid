@@ -37,6 +37,7 @@ export interface TaktProps {
   /** Auto-track `[data-takt-event]` element clicks (props read from `data-takt-prop-*`). */
   tagged?: boolean
   redactRoutes?: string[]
+  redactUndecodablePaths?: boolean
   routeTemplates?: boolean
   routeTemplate?: () => string | null | undefined
   debug?: boolean
@@ -64,6 +65,7 @@ export function Takt(props: TaktProps): JSX.Element {
       exclude: props.exclude,
       scrubUrl: props.scrubUrl,
       redactRoutes: props.redactRoutes,
+      redactUndecodablePaths: props.redactUndecodablePaths,
       routeTemplates: props.routeTemplates,
       routeTemplate: props.routeTemplate ? () => props.routeTemplate?.() : undefined,
       debug: props.debug,

@@ -1,5 +1,11 @@
 # @vskstudio/takt-solid
 
+## 0.10.1
+
+### Patch Changes
+
+- c8569e8: Embarque takt-core 0.12.2 : liste unique de 21 extensions de téléchargement.
+
 ## 0.10.0
 
 ### Minor Changes

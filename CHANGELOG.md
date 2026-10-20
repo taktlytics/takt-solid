@@ -28,7 +28,7 @@
 
 ### Patch Changes
 
-- Fix the context channel: Solid's provider reads `props.value` untracked, so the context value stayed frozen on the pre-mount `null` and every descendant silently fell back to the module singleton — which also made two `<Takt>` on the same page overwrite each other. The context now carries a stable channel holding the instance accessor; `useTakt()` keeps returning a `TaktInstance` and each subtree resolves its own instance. Unmounting one `<Takt>` no longer clears the fallback published by another still-mounted one.
+- Fix the context channel: Solid's provider reads `props.value` untracked, so the context value stayed frozen on the pre-mount `null` and every descendant silently fell back to the module singleton, which also made two `<Takt>` on the same page overwrite each other. The context now carries a stable channel holding the instance accessor; `useTakt()` keeps returning a `TaktInstance` and each subtree resolves its own instance. Unmounting one `<Takt>` no longer clears the fallback published by another still-mounted one.
 - Add `enableTagged` to `TaktInstance` and to the no-op instance: `<Takt tagged>` calls it, so calling it on a no-op threw a `TypeError` instead of being inert.
 - Docs: the default endpoint is `https://taktlytics.com/api/event` (pass `/api/event` explicitly for a same-origin first-party proxy), `useTakt()` must be resolved at click time rather than captured in the component body, and tagged autocapture targets `[data-takt-event]` / `data-takt-prop-*` (not `[data-takt-tag]`). Also documents the custom-element attributes and the `@vskstudio/takt-core` `>=0.8.1` peer bound.
 

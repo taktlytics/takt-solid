@@ -115,7 +115,7 @@ A brace parameter can carry a `<regex>` constraint, for example `{id<\d+>}`, whi
 
 A path that cannot be decoded (a malformed `%` escape or invalid UTF-8) is masked as `/[redacted]` as soon as a route is configured. Set `redactUndecodablePaths={false}` to decode it leniently instead, keeping an invalid escape as written and still matching the routes. A path that still changes after five decoding passes is always masked. When a path is masked, its query string and fragment are dropped too.
 
-For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
+For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. Downloads are always sent as `/[redacted]`, whatever their host, and every referrer is reduced to its origin. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
 
 ```tsx
 import { Router, Route, useCurrentMatches, type RouteSectionProps } from '@solidjs/router'
@@ -140,7 +140,7 @@ export function App() {
 }
 ```
 
-`solidRouterTemplate` only needs an accessor returning `{ route: { pattern } }[]`, so the package does not depend on `@solidjs/router`. When no route matches, `redactRoutes` still applies and the real path is sent otherwise. On a public site this mode merges every article into one row, so prefer `redactRoutes` there.
+`solidRouterTemplate` only needs an accessor returning `{ route: { pattern } }[]`, so the package does not depend on `@solidjs/router`. When the resolver returns nothing, `redactRoutes` still applies and `/[redacted]` is sent otherwise, without query or hash. On a public site this mode merges every article into one row, so prefer `redactRoutes` there.
 
 ## Declarative click tracking
 

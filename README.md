@@ -3,7 +3,7 @@
 # @vskstudio/takt-solid
 
 
-> 📚 **Documentation** — [taktlytics.com/docs/wrappers/solid](https://taktlytics.com/docs/wrappers/solid)
+> 📚 **Documentation**: [taktlytics.com/docs/wrappers/solid](https://taktlytics.com/docs/wrappers/solid)
 
 **Idiomatic SolidJS wrapper for [Takt](https://github.com/taktlytics/takt-core) privacy-friendly analytics.**
 
@@ -15,12 +15,12 @@
 
 ---
 
-A thin, SSR-safe Solid layer over [`@vskstudio/takt-core`](https://www.npmjs.com/package/@vskstudio/takt-core). It never changes the wire payload or the privacy guarantees — it just makes Takt feel native in a Solid app.
+A thin, SSR-safe Solid layer over [`@vskstudio/takt-core`](https://www.npmjs.com/package/@vskstudio/takt-core). It never changes the wire payload or the privacy guarantees. It just makes Takt feel native in a Solid app.
 
-- **`<Takt>` component** — drop it once near the root; it boots analytics in `onMount` and provides the instance to the tree.
-- **`useTakt()`** — resolve the live instance at call time, anywhere; returns a never-throwing no-op before mount or during SSR.
-- **`createTaktEvent()` & `<TaktEvent>`** — declarative click tracking.
-- **`<takt-analytics>` custom element** — framework-agnostic, Solid-free embed for non-Solid pages.
+- **`<Takt>` component**: drop it once near the root; it boots analytics in `onMount` and provides the instance to the tree.
+- **`useTakt()`**: resolve the live instance at call time, anywhere; returns a never-throwing no-op before mount or during SSR.
+- **`createTaktEvent()` & `<TaktEvent>`**: declarative click tracking.
+- **`<takt-analytics>` custom element**: framework-agnostic, Solid-free embed for non-Solid pages.
 
 ## Install
 
@@ -30,7 +30,7 @@ pnpm add @vskstudio/takt-solid @vskstudio/takt-core
 
 `solid-js` (`^1.8`) and `@vskstudio/takt-core` (`>=0.10.0`) are peer dependencies.
 
-## Quick start — provider + accessor
+## Quick start: provider + accessor
 
 Mount `<Takt>` once near your root. It fires an initial pageview, wires SPA navigation, and provides the instance to every descendant:
 
@@ -55,7 +55,7 @@ export function SignupButton() {
   return (
     <button
       onClick={() =>
-        // Resolve at click time — `<Takt>` boots in onMount, so a call in the
+        // Resolve at click time: `<Takt>` boots in onMount, so a call in the
         // component body would capture (and keep) the pre-mount no-op.
         useTakt().track('Signup', {
           props: { plan: 'pro' },
@@ -69,7 +69,7 @@ export function SignupButton() {
 }
 ```
 
-`useTakt()` resolves the instance **at call time** and always returns something usable: before `<Takt>` mounts (or during SSR) it hands back a never-throwing no-op, so your handlers never crash. Call it inside the handler, or inside `onMount`/`createEffect` if you need to hold on to it — never at the top of the component body, where the returned value would be the no-op forever.
+`useTakt()` resolves the instance **at call time** and always returns something usable: before `<Takt>` mounts (or during SSR) it hands back a never-throwing no-op, so your handlers never crash. Call it inside the handler, or inside `onMount`/`createEffect` if you need to hold on to it. Never at the top of the component body, where the returned value would be the no-op forever.
 
 ## `<Takt>` props
 
@@ -77,23 +77,23 @@ export function SignupButton() {
 | ------------------ | --------------------- | -------------------- | -------------------------------------------------------------- |
 | `domain`           | `string`              | `location.hostname`  | Site identifier sent with every event.                         |
 | `endpoint`         | `string`              | `https://taktlytics.com/api/event` | Ingestion endpoint. Pass `/api/event` for a same-origin first-party proxy. |
-| `scriptOrigin`     | `string`              | —                    | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers (endpoint wins over it). |
+| `scriptOrigin`     | `string`              | n/a | First-party origin to derive the endpoint from (`{origin}/api/event`): your Takt domain or a custom domain to dodge ad-blockers (endpoint wins over it). |
 | `outbound`         | `boolean`             | `false`              | Auto-track outbound link clicks.                               |
 | `files`            | `boolean \| string[]` | `false`              | Auto-track file downloads; pass extensions to restrict.        |
 | `spa`              | `boolean`             | `true`               | Track SPA navigations (pushState/replaceState + popstate).     |
 | `track404`         | `boolean`             | `false`              | Report a `404` event when the page is an error page (`[data-takt-404]` / `<meta name="takt:404">` marker, or a 404 HTTP status). |
 | `respectDnt`       | `boolean`             | `true`               | Suppress events when the browser's Do Not Track is enabled.    |
 | `excludeLocalhost` | `boolean`             | `true`               | Suppress events on localhost and private IP ranges.            |
-| `enabled`          | `boolean`             | `true`               | Master switch — set to `false` to fully disable tracking.      |
-| `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0–1).                           |
+| `enabled`          | `boolean`             | `true`               | Master switch: set to `false` to fully disable tracking.      |
+| `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0 to 1).                           |
 | `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
-| `queryParams`      | `string[]`            | —                    | Query parameters to keep when `trackQuery` is false.           |
-| `exclude`          | `string[]`            | —                    | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
-| `scrubUrl`         | `(url: string) => string` | —              | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop — config only, not available as a custom-element attribute. |
+| `queryParams`      | `string[]`            | n/a | Query parameters to keep when `trackQuery` is false.           |
+| `exclude`          | `string[]`            | n/a | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
+| `scrubUrl`         | `(url: string) => string` | n/a | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop: config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
-| `redactRoutes`     | `string[]`            | —                    | Route patterns sent as the pattern instead of the real path, e.g. `['/verify/:token']`. See [Route redaction](#route-redaction). |
+| `redactRoutes`     | `string[]`            | n/a | Route patterns sent as the pattern instead of the real path, e.g. `['/verify/:token']`. See [Route redaction](#route-redaction). |
 | `routeTemplates`   | `boolean`             | `false`              | Send every page as its route template (`/blog/:slug`). Needs `routeTemplate`. |
-| `routeTemplate`    | `() => string \| null \| undefined` | —   | Returns the current route template. Use `solidRouterTemplate(useCurrentMatches())` with `@solidjs/router`. |
+| `routeTemplate`    | `() => string \| null \| undefined` | n/a | Returns the current route template. Use `solidRouterTemplate(useCurrentMatches())` with `@solidjs/router`. |
 | `debug`            | `boolean`             | `false`              | Log each payload to the console before sending.                |
 
 > Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect, so remount the component to reconfigure. `routeTemplate` is the exception: it is read on every pageview.
@@ -185,7 +185,7 @@ import '@vskstudio/takt-solid/element'
 | `domain`           | value         | Site identifier.                                                |
 | `endpoint`         | value         | Ingestion endpoint.                                             |
 | `script-origin`    | value         | First-party origin to derive the endpoint from.                 |
-| `sample-rate`      | value         | Fraction of sessions to track (0–1); ignored if not a number.   |
+| `sample-rate`      | value         | Fraction of sessions to track (0 to 1); ignored if not a number.   |
 | `query-params`     | value         | Comma-separated list of query parameters to keep.               |
 | `exclude`          | value         | Comma-separated path prefixes never tracked.                    |
 | `redact-routes`    | value         | Comma-separated route patterns sent as the pattern, e.g. `/verify/:token, /reset/:code`. |
@@ -204,7 +204,7 @@ Privacy attributes are on by default and only disabled by an explicit `"false"`/
 
 ## SSR
 
-`<Takt>` boots inside `onMount` and is guarded by Solid's `isServer`, so nothing touches `window`/`document` on the server. `useTakt()` returns the no-op during the server pass. Importing `@vskstudio/takt-solid/element` on the server is a no-op — registration is guarded behind a `customElements` check.
+`<Takt>` boots inside `onMount` and is guarded by Solid's `isServer`, so nothing touches `window`/`document` on the server. `useTakt()` returns the no-op during the server pass. Importing `@vskstudio/takt-solid/element` on the server is a no-op: registration is guarded behind a `customElements` check.
 
 ## Privacy
 

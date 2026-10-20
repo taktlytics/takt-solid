@@ -6,7 +6,7 @@ import { createTaktEvent, type TaktEventParams } from './createTaktEvent'
  * Declarative click tracking around a single child element:
  * `<TaktEvent name="Signup"><button>…</button></TaktEvent>`. Tracks through the
  * active instance on click, composing (not replacing) any handler already on the
- * child — the child's own `onClick` keeps firing.
+ * child, the child's own `onClick` keeps firing.
  */
 export function TaktEvent(props: TaktEventParams & { children: JSX.Element }): JSX.Element {
   const { onClick } = createTaktEvent(props)

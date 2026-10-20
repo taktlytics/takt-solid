@@ -16,12 +16,12 @@ export const TaktContext = createContext<TaktChannel | null>(null)
 
 export const taktStore: { value: TaktInstance | null } = { value: null }
 
-// Forme liée au composant — doit être appelée sous <Takt>. Préfère l'instance du contexte.
+// Forme liée au composant, doit être appelée sous <Takt>. Préfère l'instance du contexte.
 export function useResolveTakt(): TaktInstance | null {
   return useContext(TaktContext)?.instance() ?? taktStore.value
 }
 
-// Forme non réactive — sûre au moment du clic / hors de l'arbre de composants.
+// Forme non réactive, sûre au moment du clic / hors de l'arbre de composants.
 export function resolveTakt(): TaktInstance | null {
   return taktStore.value
 }

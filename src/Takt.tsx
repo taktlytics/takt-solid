@@ -8,7 +8,7 @@ export interface TaktProps {
   domain?: string
   /** Ingestion endpoint. Defaults to `https://taktlytics.com/api/event` (the hosted Takt origin); pass `/api/event` for a same-origin first-party proxy. */
   endpoint?: string
-  /** First-party origin to derive the endpoint from (`{origin}/api/event`) — a custom domain you proxy through to dodge ad-blockers (endpoint wins over it). */
+  /** First-party origin to derive the endpoint from (`{origin}/api/event`): a custom domain you proxy through to dodge ad-blockers (endpoint wins over it). */
   scriptOrigin?: string
   /** Auto-track outbound link clicks. */
   outbound?: boolean
@@ -22,9 +22,9 @@ export interface TaktProps {
   respectDnt?: boolean
   /** Suppress events on localhost and private IP ranges. */
   excludeLocalhost?: boolean
-  /** Master switch — set to `false` to fully disable tracking. */
+  /** Master switch: set to `false` to fully disable tracking. */
   enabled?: boolean
-  /** Fraction of sessions to track (0–1). */
+  /** Fraction of sessions to track (0 to 1). */
   sampleRate?: number
   /** Include the query string in page URLs. */
   trackQuery?: boolean

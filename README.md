@@ -88,10 +88,11 @@ export function SignupButton() {
 | `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0 to 1).                           |
 | `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
 | `queryParams`      | `string[]`            | n/a | Query parameters to keep when `trackQuery` is false.           |
-| `exclude`          | `string[]`            | n/a | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
+| `exclude`          | `string[]`            | n/a | Path prefixes never tracked, e.g. `['/app', '/account']`. Segment-bounded, case-insensitive, blind to a trailing slash and to percent-encoding (`/admin` excludes `/%61dmin`), checked at send time. |
 | `scrubUrl`         | `(url: string) => string` | n/a | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop: config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
 | `redactRoutes`     | `string[]`            | n/a | Route patterns sent as the pattern instead of the real path, e.g. `['/verify/:token']`. See [Route redaction](#route-redaction). |
+| `redactUndecodablePaths` | `boolean`       | `true`               | When a route is configured, a path that cannot be decoded is sent as `/[redacted]`. `false` decodes it leniently and still matches it, as takt-core-php does. |
 | `routeTemplates`   | `boolean`             | `false`              | Send every page as its route template (`/blog/:slug`). Needs `routeTemplate`. |
 | `routeTemplate`    | `() => string \| null \| undefined` | n/a | Returns the current route template. Use `solidRouterTemplate(useCurrentMatches())` with `@solidjs/router`. |
 | `debug`            | `boolean`             | `false`              | Log each payload to the console before sending.                |
@@ -108,9 +109,13 @@ Query strings are stripped by default, but path segments are sent as they are: `
 </Takt>
 ```
 
-Patterns accept Solid Router syntax (`:param`, `:param?`, `*rest`) as well as `[param]`, `[[optional]]`, `[...rest]`, `(group)`, `*` and `**`. The rule covers the page URL, same-origin referrers, outbound and download link destinations, and 404 paths.
+Patterns accept Solid Router syntax (`:param`, `:param?`, `*rest`), SvelteKit / Astro / Next syntax (`[param]`, `[[optional]]`, `[...rest]`, `(group)`), `*` and `**`, and the braces of takt-core-php (`{param}`, `{param?}`, `{param<regex>}`). The rule covers the page URL, same-origin referrers, outbound and download link destinations, and 404 paths.
 
-For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
+A brace parameter can carry a `<regex>` constraint, for example `{id<\d+>}`, which only matches a segment satisfying it. The constraint must follow a closed grammar (printable ASCII, literals, `.`, `\d \D \w \W \s \S`, classes, top-level alternation and bounded quantifiers) and a route stays within size and ambiguity bounds. A constraint outside that grammar, or a route over those bounds, is unusable: every path it would match is masked as `/[redacted]` rather than sent raw.
+
+A path that cannot be decoded (a malformed `%` escape or invalid UTF-8) is masked as `/[redacted]` as soon as a route is configured. Set `redactUndecodablePaths={false}` to decode it leniently instead, keeping an invalid escape as written and still matching the routes. A path that still changes after five decoding passes is always masked. When a path is masked, its query string and fragment are dropped too.
+
+For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. In that template mode, downloads are always sent as `/[redacted]`, whatever their host, and every referrer is reduced to its origin. Outside it, a download path is masked only by `redactRoutes`. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
 
 ```tsx
 import { Router, Route, useCurrentMatches, type RouteSectionProps } from '@solidjs/router'
@@ -135,7 +140,7 @@ export function App() {
 }
 ```
 
-`solidRouterTemplate` only needs an accessor returning `{ route: { pattern } }[]`, so the package does not depend on `@solidjs/router`. When no route matches, `redactRoutes` still applies and the real path is sent otherwise. On a public site this mode merges every article into one row, so prefer `redactRoutes` there.
+`solidRouterTemplate` only needs an accessor returning `{ route: { pattern } }[]`, so the package does not depend on `@solidjs/router`. When the resolver returns nothing, `redactRoutes` still applies and `/[redacted]` is sent otherwise, without query or hash. On a public site this mode merges every article into one row, so prefer `redactRoutes` there.
 
 ## Declarative click tracking
 
@@ -189,6 +194,8 @@ import '@vskstudio/takt-solid/element'
 | `query-params`     | value         | Comma-separated list of query parameters to keep.               |
 | `exclude`          | value         | Comma-separated path prefixes never tracked.                    |
 | `redact-routes`    | value         | Comma-separated route patterns sent as the pattern, e.g. `/verify/:token, /reset/:code`. |
+| `redact-undecodable-paths` | value | Set to `"false"` or `"0"` to decode undecodable paths leniently; any other value keeps the masking. |
+| `file-extensions`  | value         | Comma-separated extensions tracked as downloads; applies only with `files`, which otherwise uses the default list. |
 | `respect-dnt`      | default-on    | Disabled only by `"false"`/`"0"`.                               |
 | `exclude-localhost`| default-on    | Disabled only by `"false"`/`"0"`.                               |
 | `spa`              | default-on    | Disabled only by `"false"`/`"0"`.                               |

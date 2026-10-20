@@ -106,6 +106,16 @@ describe('<Takt>', () => {
     )
   })
 
+  it('forwards redactUndecodablePaths={false} to createTakt', () => {
+    render(() => <Takt redactRoutes={['/orders/[id]']} redactUndecodablePaths={false}>x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ redactUndecodablePaths: false }))
+  })
+
+  it('leaves redactUndecodablePaths to the core default when the prop is absent', () => {
+    render(() => <Takt redactRoutes={['/orders/[id]']}>x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ redactUndecodablePaths: undefined }))
+  })
+
   it('leaves routeTemplate undefined when no resolver is given', () => {
     render(() => <Takt routeTemplates>x</Takt>)
     expect(createTakt).toHaveBeenCalledWith(expect.objectContaining({ routeTemplate: undefined }))

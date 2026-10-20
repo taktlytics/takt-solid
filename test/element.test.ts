@@ -172,4 +172,48 @@ describe('<takt-analytics> element', () => {
     expect(enableTagged).not.toHaveBeenCalled()
     elWithout.remove()
   })
+
+  it('turns redactUndecodablePaths off only for "false" or "0"', () => {
+    defineTaktElement()
+    for (const value of ['false', '0']) {
+      const el = document.createElement('takt-analytics')
+      el.setAttribute('redact-undecodable-paths', value)
+      document.body.appendChild(el)
+      expect(createTakt).toHaveBeenLastCalledWith(expect.objectContaining({ redactUndecodablePaths: false }))
+      el.remove()
+    }
+  })
+
+  it('keeps redactUndecodablePaths on for any other value and omits it when absent', () => {
+    defineTaktElement()
+    const withTrue = document.createElement('takt-analytics')
+    withTrue.setAttribute('redact-undecodable-paths', 'true')
+    document.body.appendChild(withTrue)
+    expect(createTakt).toHaveBeenLastCalledWith(expect.objectContaining({ redactUndecodablePaths: true }))
+    withTrue.remove()
+
+    const bare = document.createElement('takt-analytics')
+    document.body.appendChild(bare)
+    expect(createTakt).toHaveBeenLastCalledWith(expect.not.objectContaining({ redactUndecodablePaths: expect.anything() }))
+    bare.remove()
+  })
+
+  it('forwards file-extensions CSV to enableFiles', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    el.setAttribute('files', '')
+    el.setAttribute('file-extensions', 'pdf, zip,')
+    document.body.appendChild(el)
+    expect(enableFiles).toHaveBeenCalledWith(['pdf', 'zip'])
+    el.remove()
+  })
+
+  it('calls enableFiles without a list when file-extensions is absent', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    el.setAttribute('files', '')
+    document.body.appendChild(el)
+    expect(enableFiles).toHaveBeenCalledWith(undefined)
+    el.remove()
+  })
 })

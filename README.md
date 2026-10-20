@@ -88,7 +88,7 @@ export function SignupButton() {
 | `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0 to 1).                           |
 | `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
 | `queryParams`      | `string[]`            | n/a | Query parameters to keep when `trackQuery` is false.           |
-| `exclude`          | `string[]`            | n/a | Path prefixes never tracked, e.g. `['/app', '/account']`. Segment-bounded, case-insensitive, blind to a trailing slash and to percent-encoding (`/%61dmin` excludes `/admin`), checked at send time. |
+| `exclude`          | `string[]`            | n/a | Path prefixes never tracked, e.g. `['/app', '/account']`. Segment-bounded, case-insensitive, blind to a trailing slash and to percent-encoding (`/admin` excludes `/%61dmin`), checked at send time. |
 | `scrubUrl`         | `(url: string) => string` | n/a | Transform URLs before they are sent (page, referrer, and the `url` prop of outbound-link and file-download events). Function prop: config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
 | `redactRoutes`     | `string[]`            | n/a | Route patterns sent as the pattern instead of the real path, e.g. `['/verify/:token']`. See [Route redaction](#route-redaction). |
@@ -115,7 +115,7 @@ A brace parameter can carry a `<regex>` constraint, for example `{id<\d+>}`, whi
 
 A path that cannot be decoded (a malformed `%` escape or invalid UTF-8) is masked as `/[redacted]` as soon as a route is configured. Set `redactUndecodablePaths={false}` to decode it leniently instead, keeping an invalid escape as written and still matching the routes. A path that still changes after five decoding passes is always masked. When a path is masked, its query string and fragment are dropped too.
 
-For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. Downloads are always sent as `/[redacted]`, whatever their host, and every referrer is reduced to its origin. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
+For a fully private app, `routeTemplates` sends every page as its route template: `/blog/hello` becomes `/blog/:slug`. In that template mode, downloads are always sent as `/[redacted]`, whatever their host, and every referrer is reduced to its origin. Outside it, a download path is masked only by `redactRoutes`. With `@solidjs/router`, call `useCurrentMatches()` in a component rendered under the router and hand it to `solidRouterTemplate()`, which returns the `pattern` of the deepest matched route:
 
 ```tsx
 import { Router, Route, useCurrentMatches, type RouteSectionProps } from '@solidjs/router'
